@@ -1,0 +1,3 @@
+show run
+show ip int brief
+show inventory
