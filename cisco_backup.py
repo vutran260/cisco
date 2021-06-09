@@ -96,6 +96,8 @@ def get_command_dict():
             key = os.path.splitext(filename)[0]
             command_dict[key] = []
             for line in f:
+                if not line.strip():
+                    continue
                 str_line = line.strip().split(",")
                 command = Command(command_type=str_line[0], command_action=str_line[1])
                 command_dict[key].append(command)
