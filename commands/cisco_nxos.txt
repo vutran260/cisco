@@ -1,3 +1,3 @@
-show run
-show ip int brief
-show inventory
+send_command,show run
+send_command,show ip int brief
+send_command,show inventory

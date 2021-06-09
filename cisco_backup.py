@@ -4,6 +4,8 @@ import threading
 import time
 import os
 
+from models.command import Command
+
 
 def get_current_date():
     day = time.strftime('%d')
@@ -58,25 +60,26 @@ def get_devices(username, password, secret):
 
 
 def backup_configs(device, commands):
+
+    # create today folder is not exist
+    today_folder = get_current_date()
+    os.makedirs(get_current_date(), exist_ok=True)
+
     try:
         remote_conn = ConnectHandler(**device)
-
-        # create today folder is not exist
-        today_folder = get_current_date()
-        os.makedirs(today_folder, exist_ok=True)
 
         # save successful connection into today folder
         filename = os.path.join(today_folder, get_filename_success(device))
         save_config = open(filename, "w+")
 
         for command in commands:
-            output = remote_conn.send_command(command)
+            output = getattr(remote_conn, command.command_type)(command.command_action)
             save_config.write(output)
 
         save_config.close()
         remote_conn.disconnect()
     except Exception as e:
-        filename = get_filename_error(device)
+        filename = os.path.join(today_folder, get_filename_error(device))
         save_error = open(filename, "w+")
         save_error.write("Access to " + device['ip'] + " failed, backup did not taken. Exception: " + str(e))
         save_error.close()
@@ -90,8 +93,12 @@ def get_command_dict():
 
     for filename in os.listdir('commands'):
         with open(os.path.join('commands', filename), 'r') as f:
-            commands = f.read().splitlines()
-            command_dict[os.path.splitext(filename)[0]] = commands
+            key = os.path.splitext(filename)[0]
+            command_dict[key] = []
+            for line in f:
+                str_line = line.strip().split(",")
+                command = Command(command_type=str_line[0], command_action=str_line[1])
+                command_dict[key].append(command)
 
     return command_dict
 

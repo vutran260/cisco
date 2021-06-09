@@ -1,0 +1,9 @@
+Access to 192.168.100.10 failed, backup did not taken. Exception: TCP connection to device failed.
+
+Common causes of this problem are:
+1. Incorrect hostname or IP address.
+2. Wrong TCP port.
+3. Intermediate firewall blocking access.
+
+Device settings: cisco_ios 192.168.100.10:22
+
