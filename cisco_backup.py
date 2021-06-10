@@ -73,7 +73,14 @@ def backup_configs(device, commands):
         save_config = open(filename, "w+")
 
         for command in commands:
-            output = getattr(remote_conn, command.command_type)(command.command_action.split(";"))
+            actions = command.command_action.split(";")
+            if len(actions) == 0:
+                continue
+            elif len(actions) == 1:
+                output = getattr(remote_conn, command.command_type)(actions[0])
+            else:
+                output = getattr(remote_conn, command.command_type)(actions)
+
             save_config.write(output)
 
         save_config.close()
