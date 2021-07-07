@@ -30,6 +30,12 @@ def get_filename_error(device, extension="txt"):
     )
 
 
+def get_filename_summary(extension="csv"):
+    return "summary.{ext}".format(
+        ext=extension
+    )
+
+
 def get_credentials():
     username = input("username ")
     password = getpass.getpass()
@@ -65,6 +71,9 @@ def backup_configs(device, commands):
     today_folder = get_current_date()
     os.makedirs(get_current_date(), exist_ok=True)
 
+    summary = os.path.join(today_folder, get_filename_summary())
+    save_summary = open(summary, "a")
+
     try:
         remote_conn = ConnectHandler(**device)
 
@@ -83,6 +92,11 @@ def backup_configs(device, commands):
 
             save_config.write(output)
 
+        save_summary.write("{ip},{status}".format(
+            ip=device['ip'],
+            status="Success"
+        ))
+
         save_config.close()
         remote_conn.disconnect()
     except Exception as e:
@@ -90,6 +104,13 @@ def backup_configs(device, commands):
         save_error = open(filename, "w+")
         save_error.write("Access to " + device['ip'] + " failed, backup did not taken. Exception: " + str(e))
         save_error.close()
+
+        save_summary.write("{ip},{status}".format(
+            ip=device['ip'],
+            status="Failed"
+        ))
+    finally:
+        save_summary.close()
 
 
 def get_command_dict():
