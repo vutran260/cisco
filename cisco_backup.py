@@ -96,6 +96,7 @@ def backup_configs(device, commands):
             ip=device['ip'],
             status="Success"
         ))
+        save_summary.write("\n")
 
         save_config.close()
         remote_conn.disconnect()
@@ -109,6 +110,7 @@ def backup_configs(device, commands):
             ip=device['ip'],
             status="Failed"
         ))
+        save_summary.write("\n")
     finally:
         save_summary.close()
 
